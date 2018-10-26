@@ -22,6 +22,17 @@ const isCellAvailableWithReferenceToLeftDiagonal = function(row, column, queenBo
   return result;
 }
 
+const isCellAvailableWithReferenceToRightDiagonal = function(row, column, queenBoard) {
+  let result = true;
+  for(row = row-1, column = column+1; row>=0 && column<6; row--, column++) {
+    if(queenBoard[row][column] == 'Q') {
+      result = false;
+      return result;
+    }
+  }
+  return result;
+}
+
 const moveQueen = function(queenBoard) {
   let completedRows = [];
   let completedColumns = [];
@@ -29,6 +40,7 @@ const moveQueen = function(queenBoard) {
     for(let column = 0; column < queenBoard.length && !completedRows.includes(row); column++) {
       let isColAvailable = isColumnAvailable(column, completedColumns);
       let isCellAvailable = isColAvailable && isCellAvailableWithReferenceToLeftDiagonal(row, column, queenBoard);
+      isCellAvailable = isCellAvailable && isCellAvailableWithReferenceToRightDiagonal(row, column, queenBoard);
       if(isCellAvailable) {
         queenBoard[row][column] = 'Q';
         completedRows.push(row);
