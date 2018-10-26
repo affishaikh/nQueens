@@ -7,8 +7,19 @@ const createQueenBoard = function(queenBoardLength) {
   return queenBoard;
 }
 
-const isColumnCompleted = function(column, completedColumns) {
-  return completedColumns.includes(column);
+const isColumnAvailable = function(column, completedColumns) {
+  return !completedColumns.includes(column);
+}
+
+const isCellAvailableWithReferenceToLeftDiagonal = function(row, column, queenBoard) {
+  let result = true;
+  for(row = row-1, column = column-1; row>=0 && column>=0; row--, column--) {
+    if(queenBoard[row][column] == 'Q') {
+      result = false;
+      return result;
+    }
+  }
+  return result;
 }
 
 const moveQueen = function(queenBoard) {
@@ -16,7 +27,9 @@ const moveQueen = function(queenBoard) {
   let completedColumns = [];
   for(let row = 0; row < queenBoard.length; row++) {
     for(let column = 0; column < queenBoard.length && !completedRows.includes(row); column++) {
-      if(!isColumnCompleted(column, completedColumns)) {
+      let isColAvailable = isColumnAvailable(column, completedColumns);
+      let isCellAvailable = isColAvailable && isCellAvailableWithReferenceToLeftDiagonal(row, column, queenBoard);
+      if(isCellAvailable) {
         queenBoard[row][column] = 'Q';
         completedRows.push(row);
         completedColumns.push(column);
