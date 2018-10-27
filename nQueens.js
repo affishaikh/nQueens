@@ -34,8 +34,8 @@ const isCellAvailableWithReferenceToRightDiagonal = function(row, column, queenB
 }
 
 const moveQueen = function(queenBoard) {
-  for(let row = 1; row < queenBoard.length; row++) {
-    for(let column = 0; column < queenBoard.length && !queenBoard.completedRows.includes(row); column++) {
+  for(let row = 1; row < queenBoard.board.length; row++) {
+    for(let column = 0; column < queenBoard.board.length && !queenBoard.completedRows.includes(row); column++) {
       let isColAvailable = isColumnAvailable(column, queenBoard.completedColumns);
       let isCellAvailable = isColAvailable && isCellAvailableWithReferenceToLeftDiagonal(row, column, queenBoard.board);
       isCellAvailable = isCellAvailable && isCellAvailableWithReferenceToRightDiagonal(row, column, queenBoard.board);
@@ -45,23 +45,36 @@ const moveQueen = function(queenBoard) {
         queenBoard.completedColumns.push(column);
       }
     }
+    if(!queenBoard.completedRows.includes(row)) {
+      queenBoard.isBoardComplete = false;
+      return queenBoard;
+    }
   }
+  queenBoard.isBoardComplete = true; 
   return queenBoard;
 }
 
 const firstRowMoveGenerator = function(index, length) {
   return function() {
+    if(index >= length) {
+      console.log("The index exceeds the queenBoard");
+      process.exit(0);
+    }
     let board = createQueenBoard(length);
     board[0][index] = 'Q';
-    return {board: board, completedColumns: [index++], completedRows: [], length: length};
+    return {board: board, completedColumns: [index++], completedRows: [0], length: length, isBoardComplete: false};
   }
 }
 
 const main = function() {
   let queenBoardLength = +process.argv[2];
   let moveQueenInFirstRow = firstRowMoveGenerator(0, queenBoardLength);
-  queenBoard = moveQueenInFirstRow();
-  console.log(moveQueen(queenBoard).board); 
+  let queenBoard = {};
+  do {
+    queenBoard = moveQueenInFirstRow();
+    queenBoard = moveQueen(queenBoard);
+  }while(!queenBoard.isBoardComplete) 
+  console.log(queenBoard.board)
 }
 
 main();
