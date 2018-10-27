@@ -34,27 +34,34 @@ const isCellAvailableWithReferenceToRightDiagonal = function(row, column, queenB
 }
 
 const moveQueen = function(queenBoard) {
-  let completedRows = [];
-  let completedColumns = [];
-  for(let row = 0; row < queenBoard.length; row++) {
-    for(let column = 0; column < queenBoard.length && !completedRows.includes(row); column++) {
-      let isColAvailable = isColumnAvailable(column, completedColumns);
-      let isCellAvailable = isColAvailable && isCellAvailableWithReferenceToLeftDiagonal(row, column, queenBoard);
-      isCellAvailable = isCellAvailable && isCellAvailableWithReferenceToRightDiagonal(row, column, queenBoard);
+  for(let row = 1; row < queenBoard.length; row++) {
+    for(let column = 0; column < queenBoard.length && !queenBoard.completedRows.includes(row); column++) {
+      let isColAvailable = isColumnAvailable(column, queenBoard.completedColumns);
+      let isCellAvailable = isColAvailable && isCellAvailableWithReferenceToLeftDiagonal(row, column, queenBoard.board);
+      isCellAvailable = isCellAvailable && isCellAvailableWithReferenceToRightDiagonal(row, column, queenBoard.board);
       if(isCellAvailable) {
-        queenBoard[row][column] = 'Q';
-        completedRows.push(row);
-        completedColumns.push(column);
+        queenBoard.board[row][column] = 'Q';
+        queenBoard.completedRows.push(row);
+        queenBoard.completedColumns.push(column);
       }
     }
   }
   return queenBoard;
 }
 
+const firstRowMoveGenerator = function(index, length) {
+  return function() {
+    let board = createQueenBoard(length);
+    board[0][index] = 'Q';
+    return {board: board, completedColumns: [index++], completedRows: [], length: length};
+  }
+}
+
 const main = function() {
   let queenBoardLength = +process.argv[2];
-  queenBoard = createQueenBoard(queenBoardLength);
-  console.log(moveQueen(queenBoard)); 
+  let moveQueenInFirstRow = firstRowMoveGenerator(0, queenBoardLength);
+  queenBoard = moveQueenInFirstRow();
+  console.log(moveQueen(queenBoard).board); 
 }
 
 main();
